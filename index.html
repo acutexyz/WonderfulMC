@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wonderful Minecraft | 精彩纷呈的世界</title>
+    <style>
+        /* 全局样式 */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e6f7ff;
+            color: #333;
+            overflow-x: hidden;
+            background-image: linear-gradient(rgba(230, 247, 255, 0.9), rgba(230, 247, 255, 0.9)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="50" height="50" fill="%23c2e6ff"/><rect x="50" y="50" width="50" height="50" fill="%23c2e6ff"/></svg>');
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* 图片区域样式 */
+        
+        .image-container {
+            height: 75vh;
+            width: 100%;
+            position: relative;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 4px solid #4db8ff;
+        }
+        
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .image-container:hover .main-image {
+            transform: scale(1.03);
+        }
+        
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        /* 标题样式 */
+        
+        .title-container {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 20px;
+        }
+        
+        .main-title {
+            font-size: 4.5rem;
+            font-weight: 700;
+            text-shadow: 3px 3px 0 #b3e0ff, 6px 6px 0 rgba(0, 0, 0, 0.1);
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: #1c9dd5;
+            letter-spacing: 2px;
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+        }
+        
+        .subtitle {
+            font-size: 2.5rem;
+            color: #006699;
+            font-weight: 600;
+            text-shadow: 2px 2px 0 #b3e0ff;
+            letter-spacing: 1px;
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+        }
+        /* 装饰元素 */
+        
+        .pixel-border {
+            position: relative;
+            margin: 0 auto;
+            width: 90%;
+        }
+        
+        .pixel-border::before,
+        .pixel-border::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #4db8ff;
+        }
+        
+        .pixel-border::before {
+            top: -10px;
+            left: -10px;
+        }
+        
+        .pixel-border::after {
+            bottom: -10px;
+            right: -10px;
+        }
+        /* 响应式设计 */
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 3rem;
+            }
+            .subtitle {
+                font-size: 1.8rem;
+            }
+            .image-container {
+                height: 60vh;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 2.2rem;
+            }
+            .subtitle {
+                font-size: 1.4rem;
+            }
+            .image-container {
+                height: 50vh;
+            }
+        }
+        /* 像素化字体导入 */
+        
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('https://fonts.cdnfonts.com/s/14550/Minecraft.woff') format('woff');
+        }
+        /* 装饰方块 */
+        
+        .floating-cubes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .cube {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(77, 184, 255, 0.3);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-cubes" id="cubes-container"></div>
+
+    <div class="container">
+        <div class="image-container">
+            <img src="index_header.jpg" alt="Minecraft Landscape" class="main-image">
+            <div class="image-overlay">
+                <p>探索无限可能的世界</p>
+            </div>
+        </div>
+
+        <div class="title-container pixel-border">
+            <h1 class="main-title">Wonderful Minecraft</h1>
+            <h2 class="subtitle">精彩纷呈的世界</h2>
+        </div>
+    </div>
+
+    <script>
+        // 创建浮动方块背景
+        document.addEventListener('DOMContentLoaded', function() {
+            const cubesContainer = document.getElementById('cubes-container');
+            const cubeCount = 30;
+
+            for (let i = 0; i < cubeCount; i++) {
+                const cube = document.createElement('div');
+                cube.classList.add('cube');
+
+                // 随机位置和大小
+                const size = Math.random() * 20 + 10;
+                cube.style.width = `${size}px`;
+                cube.style.height = `${size}px`;
+                cube.style.left = `${Math.random() * 100}vw`;
+                cube.style.top = `${Math.random() * 100}vh`;
+
+                // 使用蓝色系颜色
+                const colors = ['#4db8ff', '#66ccff', '#3399ff', '#99ddff', '#00aaff'];
+                cube.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+                // 随机动画延迟和持续时间
+                cube.style.animationDelay = `${Math.random() * 15}s`;
+                cube.style.animationDuration = `${Math.random() * 10 + 15}s`;
+
+                cubesContainer.appendChild(cube);
+            }
+        });
+    </script>
+</body>
+
+</html>
