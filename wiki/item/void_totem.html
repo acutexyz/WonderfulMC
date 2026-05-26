@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>虚空图腾 - Wonderful Minecraft Wiki</title>
+    <style>
+         :root {
+            --primary: #1c9dd5;
+            --primary-dark: #006699;
+            --primary-light: #4db8ff;
+            --bg: #e6f7ff;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text: #222;
+            --text-light: #444;
+            --border: #b3d9ff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --wiki-bg: #f5faff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Noto Sans SC', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--wiki-bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(230, 247, 255, 0.85), rgba(230, 247, 255, 0.85)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="50" height="50" fill="%23c2e6ff"/><rect x="50" y="50" width="50" height="50" fill="%23c2e6ff"/></svg>');
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navbar {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--primary-light);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .navbar-logo span {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 1.8rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(77, 184, 255, 0.6);
+            letter-spacing: 2px;
+        }
+        
+        .navbar-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .navbar-links a {
+            color: #dddddd;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.2s;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        
+        .navbar-links a:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .navbar-links a.active {
+            color: var(--primary-light);
+            border-bottom: 2px solid var(--primary-light);
+        }
+        
+        .wiki-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            gap: 30px;
+            flex: 1;
+        }
+        
+        .infobox {
+            width: 360px;
+            flex-shrink: 0;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            align-self: flex-start;
+        }
+        
+        .infobox-title {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .infobox-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            background: #f0f8ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-light);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        .infobox-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        
+        .infobox-table th,
+        .infobox-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        
+        .infobox-table th {
+            color: var(--primary-dark);
+            font-weight: 600;
+            text-align: left;
+            white-space: nowrap;
+            width: 35%;
+        }
+        
+        .infobox-table td {
+            color: var(--text);
+            word-break: break-word;
+        }
+        
+        .content {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+        
+        .content h1 {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        
+        .content h2 {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        
+        .content h3 {
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        
+        .content p {
+            margin-bottom: 15px;
+        }
+        
+        .content ul {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .content li {
+            margin-bottom: 5px;
+        }
+        
+        .quote {
+            background: #f0f8ff;
+            border-left: 4px solid var(--primary);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: var(--text-light);
+        }
+        
+        .crafting-interface {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            padding: 16px 0;
+            margin: 25px 0;
+            background: transparent !important;
+            background-color: transparent !important;
+            background-image: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            flex-wrap: wrap;
+        }
+        
+        .crafting-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 72px);
+            grid-template-rows: repeat(3, 72px);
+            gap: 6px;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .crafting-slot {
+            background-color: #8b8b8b;
+            border: 2px solid #373737;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.1s;
+            box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3), inset -1px -1px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+            cursor: default;
+        }
+        
+        .crafting-slot a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .crafting-slot img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            image-rendering: pixelated;
+            pointer-events: none;
+        }
+        
+        .crafting-slot:hover {
+            background-color: #a0a0a0;
+        }
+        
+        .crafting-arrow {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #2c2c2c;
+            text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+            user-select: none;
+            line-height: 1;
+            background: transparent;
+        }
+        
+        .result-slot {
+            background-color: #8b8b8b;
+            border: 2px solid #373737;
+            border-radius: 2px;
+            width: 72px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3), inset -1px -1px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+            transition: background-color 0.1s;
+        }
+        
+        .result-slot:hover {
+            background-color: #a0a0a0;
+        }
+        
+        .result-slot img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+        
+        .crafting-slot[data-tooltip]:hover::after,
+        .result-slot[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1e1e1e;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            white-space: pre;
+            font-size: 0.8rem;
+            z-index: 10;
+            pointer-events: none;
+            text-align: center;
+            line-height: 1.3;
+            font-weight: normal;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .sound-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .sound-table th,
+        .sound-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .sound-table th {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .sound-play-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0 4px;
+            transition: transform 0.1s;
+            vertical-align: middle;
+        }
+        
+        .sound-play-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .achievement-advancement {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .achievement-card {
+            flex: 1;
+            min-width: 200px;
+            background: #f0f8ff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .history-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .history-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .history-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .footer {
+            background: #1a1a2e;
+            color: #cccccc;
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            border-top: 3px solid var(--primary-light);
+        }
+        
+        .footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+        
+        @media (max-width: 900px) {
+            .wiki-container {
+                flex-direction: column;
+            }
+            .infobox {
+                width: 100%;
+            }
+            .crafting-interface,
+            .crafting-grid {
+                background: transparent !important;
+                background-image: none !important;
+            }
+        }
+        
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('https://fonts.cdnfonts.com/s/14550/Minecraft.woff') format('woff');
+        }
+    </style>
+
+    <!-- 统一资源配置区 -->
+    <script>
+        window.wikiAssets = {
+            images: {
+                totemOfVoid: '../images/item/totem_of_void.png',
+                enderShards: '../images/item/ender_shards.png',
+                placeholder: 'https://via.placeholder.com/64?text=Missing'
+            },
+            externalLinks: {
+                endStone: 'https://zh.minecraft.wiki/w/%E6%9C%AB%E5%9C%B0%E7%9F%B3',
+                enderPearl: 'https://zh.minecraft.wiki/w/%E6%9C%AB%E5%BD%B1%E7%8F%8D%E7%8F%A0',
+                totemOfUndying: 'https://zh.minecraft.wiki/w/%E4%B8%8D%E6%AD%BB%E5%9B%BE%E8%85%BE',
+                chorusFruit: 'https://zh.minecraft.wiki/w/%E7%B4%AB%E9%A2%82%E6%9E%9C'
+            },
+            vanillaImages: {
+                endStone: 'https://zh.minecraft.wiki/images/End_Stone_JE3_BE2.png',
+                enderPearl: 'https://zh.minecraft.wiki/images/Ender_Pearl_JE2_BE2.png',
+                totemOfUndying: 'https://zh.minecraft.wiki/images/Totem_of_Undying_JE2_BE2.png',
+                chorusFruit: 'https://zh.minecraft.wiki/images/Chorus_Fruit_JE2_BE2.png'
+            },
+            // 音效文件 URL（直接从 Minecraft Wiki 获取）
+            soundUrls: {
+                totemUse: 'https://zh.minecraft.wiki/images/Totem_of_Undying.ogg?9f340',
+                chorusTeleport1: 'https://zh.minecraft.wiki/images/Enderman_teleport1.ogg?c00c4',
+                chorusTeleport2: 'https://zh.minecraft.wiki/images/Enderman_teleport2.ogg?af806'
+            }
+        };
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="../../index.html" class="navbar-logo">
+            <span>Wonderful Minecraft</span>
+        </a>
+        <div class="navbar-links">
+            <a href="../../index.html">首页</a>
+            <a href="../main.html" class="active">Wiki</a>
+            <a href="#">关于</a>
+            <a href="#">社区</a>
+        </div>
+    </nav>
+
+    <div class="wiki-container">
+        <main class="content">
+            <h1>虚空图腾</h1>
+            <div class="quote">
+                “虚空图腾，源于对不死图腾的深度研究与虚空能量的结合。它在保留免死能力的同时，赋予了使用者撕裂空间、逃离深渊的力量——哪怕是在连神明都会陨落的虚无之中。”<br> —— DEEPSEEK
+            </div>
+            <p><strong>虚空图腾（Totem of Void）</strong>是一种可以使手持者受到致命伤害时免于死亡的物品，并且能够在虚空中生效，将使用者传送至安全地带。</p>
+
+            <h2>获取</h2>
+            <h3>合成</h3>
+            <p>虚空图腾可以通过工作台合成获得。</p>
+
+            <div class="crafting-interface">
+                <div class="crafting-grid">
+                    <div class="crafting-slot" data-tooltip="末地石">
+                        <a data-asset-href="endStone" target="_blank"><img data-asset-img-vanilla="endStone" alt="末地石"></a>
+                    </div>
+                    <div class="crafting-slot" data-tooltip="末影碎片">
+                        <a href="#"><img data-asset-img="enderShards" alt="末影碎片" data-fallback="placeholder"></a>
+                    </div>
+                    <div class="crafting-slot" data-tooltip="末地石">
+                        <a data-asset-href="endStone" target="_blank"><img data-asset-img-vanilla="endStone" alt="末地石"></a>
+                    </div>
+                    <div class="crafting-slot" data-tooltip="末影珍珠">
+                        <a data-asset-href="enderPearl" target="_blank"><img data-asset-img-vanilla="enderPearl" alt="末影珍珠"></a>
+                    </div>
+                    <div class="crafting-slot" data-tooltip="不死图腾">
+                        <a data-asset-href="totemOfUndying" target="_blank"><img data-asset-img-vanilla="totemOfUndying" alt="不死图腾"></a>
+                    </div>
+                    <div class="crafting-slot" data-tooltip="末影珍珠">
+                        <a data-asset-href="enderPearl" target="_blank"><img data-asset-img-vanilla="enderPearl" alt="末影珍珠"></a>
+                    </div>
+                    <div class="crafting-slot" data-tooltip="末地石">
+                        <a data-asset-href="endStone" target="_blank"><img data-asset-img-vanilla="endStone" alt="末地石"></a>
+                    </div>
+                    <div class="crafting-slot" data-tooltip="紫颂果">
+                        <a data-asset-href="chorusFruit" target="_blank"><img data-asset-img-vanilla="chorusFruit" alt="紫颂果"></a>
+                    </div>
+                    <div class="crafting-slot" data-tooltip="末地石">
+                        <a data-asset-href="endStone" target="_blank"><img data-asset-img-vanilla="endStone" alt="末地石"></a>
+                    </div>
+                </div>
+                <div class="crafting-arrow">→</div>
+                <div class="result-slot" data-tooltip="虚空图腾">
+                    <img data-asset-img="totemOfVoid" alt="虚空图腾">
+                </div>
+            </div>
+
+            <h3>生物掉落物</h3>
+            <p>虚空图腾本身不会由生物直接掉落，但其合成材料<strong>末影碎片</strong>可以在末地城战利品箱中找到。</p>
+
+            <h2>用途</h2>
+            <p>生物在受到致命伤害时，若<strong>主手或副手</strong>持有虚空图腾，图腾将阻止该生物死亡并触发传送效果。若仅放入物品栏而不手持，则不会生效。</p>
+            <p>虚空图腾的独特之处在于它能应对两种不同类型的致命伤害：</p>
+
+            <h3>普通致命伤害</h3>
+            <p>当受到非虚空、非<code>/kill</code>的普通致命伤害时，虚空图腾会像不死图腾一样触发，同时额外附加传送效果。</p>
+            <ul>
+                <li><strong>传送机制：</strong>将使用者随机传送到周围200格范围内的安全位置（优先寻找脚下有固体方块、头顶有空隙的地点）。</li>
+                <li><strong>失败保护：</strong>如果随机传送失败，会直接传送至世界出生点（X=0, Z=0, Y=300）。</li>
+                <li><strong>效果：</strong>生命值恢复至6点（❤×3），清除火焰，并获得生命恢复II、伤害吸收III、缓降VI（0.5秒）和力量II（60秒）。</li>
+            </ul>
+
+            <h3>虚空致命伤害</h3>
+            <p>虚空图腾最强大的特性：它可以<strong>强行阻止虚空伤害</strong>（例如掉出世界外）导致的死亡，这是原版不死图腾无法做到的。</p>
+            <ul>
+                <li><strong>触发条件：</strong>受到虚空伤害时自动激活。</li>
+                <li><strong>传送保障：</strong>先尝试随机安全传送，失败则直接传送至(0, 300, 0)。</li>
+                <li><strong>效果：</strong>生命值设为6点，清除火焰，获得生命恢复II、伤害吸收III和短暂缓降效果，防止传送后摔落。</li>
+            </ul>
+
+            <p>虚空图腾生效时，会发出响亮的声音，产生大量金色粒子（构成三层圆环）和紫颂果传送的紫色粒子。与不死图腾相同，虚空图腾在使用后即消失，每个只能使用一次。</p>
+
+            <h2>音效</h2>
+            <table class="sound-table">
+                <thead>
+                    <tr>
+                        <th>播放</th>
+                        <th>字幕</th>
+                        <th>分类</th>
+                        <th>描述</th>
+                        <th>命名空间ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><button class="sound-play-btn" data-sound="totemUse">🔊</button></td>
+                        <td>图腾：发动</td>
+                        <td>玩家</td>
+                        <td>虚空图腾生效</td>
+                        <td><code>item.totem.use</code></td>
+                    </tr>
+                    <tr>
+                        <td><button class="sound-play-btn" data-sound="chorusTeleport1">🔊</button></td>
+                        <td>紫颂果：传送（变体1）</td>
+                        <td>玩家</td>
+                        <td>虚空图腾传送音效1</td>
+                        <td><code>item.chorus_fruit.teleport</code></td>
+                    </tr>
+                    <tr>
+                        <td><button class="sound-play-btn" data-sound="chorusTeleport2">🔊</button></td>
+                        <td>紫颂果：传送（变体2）</td>
+                        <td>玩家</td>
+                        <td>虚空图腾传送音效2</td>
+                        <td><code>item.chorus_fruit.teleport</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>数据值</h2>
+            <h3>ID</h3>
+            <table class="infobox-table" style="margin: 15px 0;">
+                <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>命名空间ID</th>
+                        <th>本地化键名</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>虚空图腾</td>
+                        <td><code>revivalcorpse:totem_of_void</code></td>
+                        <td><code>item.revivalcorpse.totem_of_void</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>进度</h2>
+            <div class="achievement-advancement">
+                <div class="achievement-card">
+                    <h3>⭐ 超越生死</h3>
+                    <p>利用虚空图腾逃离死神</p>
+                    <small>上游进度：怪物猎人</small>
+                    <p style="margin-top:8px;">在虚空伤害下成功激活虚空图腾。</p>
+                </div>
+            </div>
+
+            <h2>历史</h2>
+            <ul class="history-list">
+                <li><strong>revivalcorpse 1.0.0</strong> — 加入了虚空图腾、末影碎片和末影传送剑。</li>
+                <li>虚空图腾现在可以在虚空中生效，并智能传送玩家到安全位置。</li>
+                <li>触发时给予生命恢复、伤害吸收、缓降和力量效果，并产生不死图腾粒子和传送粒子特效。</li>
+                <li>末影碎片在末地城宝箱中生成，使虚空图腾可在生存模式下获得。</li>
+            </ul>
+
+            <h2>你知道吗</h2>
+            <ul>
+                <li>虚空图腾是唯一能在虚空伤害中拯救玩家的物品，原版不死图腾对此无能为力。</li>
+                <li>触发后给予的缓降效果虽然只持续极短时间，但足以重置下落高度，防止传送后摔死。</li>
+                <li>如果你在虚空中触发且随机传送失败，将会被送到(0, 300, 0)，至于为什么是这么高的高度，那你得问作者。</li>
+            </ul>
+
+            <p style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 10px; font-style: italic;">虚空图腾是模组 <strong>revivalcorpse</strong> 添加的物品，更多内容请查阅模组文档。</p>
+        </main>
+
+        <aside class="infobox">
+            <div class="infobox-title">虚空图腾</div>
+            <div class="infobox-image">
+                <img data-asset-img="totemOfVoid" alt="虚空图腾" style="width: 100%; image-rendering: pixelated;">
+            </div>
+            <table class="infobox-table">
+                <tr>
+                    <th>稀有度</th>
+                    <td>少见</td>
+                </tr>
+                <tr>
+                    <th>创造标签页（JE）</th>
+                    <td>战斗用品</td>
+                </tr>
+                <tr>
+                    <th>最大堆叠</th>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <th>可再生</th>
+                    <td>否</td>
+                </tr>
+                <tr>
+                    <th>物品ID</th>
+                    <td style="word-break: break-word;">revivalcorpse:totem_of_void</td>
+                </tr>
+            </table>
+        </aside>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 Wonderful Minecraft | 内容采用 <a href="#">CC BY-NC-SA 3.0</a> 授权</p>
+        <p>本网站与 Mojang 或 Microsoft 无从属关系 | revivalcorpse 模组非官方Wiki</p>
+        <p><a href="../index.html">返回首页</a> | <a href="./main.html">返回Wiki主页</a></p>
+    </footer>
+
+    <!-- 自动资源注入及音效播放脚本 -->
+    <script>
+        (function() {
+            const assets = window.wikiAssets;
+            if (!assets) return;
+
+            // 填充图片
+            document.querySelectorAll('img[data-asset-img]').forEach(img => {
+                const key = img.getAttribute('data-asset-img');
+                if (assets.images && assets.images[key]) img.src = assets.images[key];
+                const fallbackKey = img.getAttribute('data-fallback');
+                if (fallbackKey && assets.images && assets.images[fallbackKey]) {
+                    img.onerror = function() {
+                        this.src = assets.images[fallbackKey];
+                    };
+                }
+            });
+            document.querySelectorAll('img[data-asset-img-vanilla]').forEach(img => {
+                const key = img.getAttribute('data-asset-img-vanilla');
+                if (assets.vanillaImages && assets.vanillaImages[key]) img.src = assets.vanillaImages[key];
+            });
+            document.querySelectorAll('a[data-asset-href]').forEach(link => {
+                const key = link.getAttribute('data-asset-href');
+                if (assets.externalLinks && assets.externalLinks[key]) link.href = assets.externalLinks[key];
+            });
+
+            // 音效播放功能
+            if (assets.soundUrls) {
+                const audioCache = {};
+                document.querySelectorAll('.sound-play-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const soundKey = btn.getAttribute('data-sound');
+                        const url = assets.soundUrls[soundKey];
+                        if (!url) return;
+                        if (!audioCache[soundKey]) {
+                            audioCache[soundKey] = new Audio(url);
+                        }
+                        const audio = audioCache[soundKey];
+                        audio.currentTime = 0;
+                        audio.play().catch(err => console.warn('播放失败:', err));
+                    });
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

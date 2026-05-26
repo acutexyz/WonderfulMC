@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>不稳定传送 - Wonderful Minecraft Wiki</title>
+    <style>
+         :root {
+            --primary: #1c9dd5;
+            --primary-dark: #006699;
+            --primary-light: #4db8ff;
+            --bg: #e6f7ff;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text: #222;
+            --text-light: #444;
+            --border: #b3d9ff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --wiki-bg: #f5faff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Noto Sans SC', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--wiki-bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(230, 247, 255, 0.85), rgba(230, 247, 255, 0.85)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="50" height="50" fill="%23c2e6ff"/><rect x="50" y="50" width="50" height="50" fill="%23c2e6ff"/></svg>');
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navbar {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--primary-light);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .navbar-logo span {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 1.8rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(77, 184, 255, 0.6);
+            letter-spacing: 2px;
+        }
+        
+        .navbar-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .navbar-links a {
+            color: #dddddd;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.2s;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        
+        .navbar-links a:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .navbar-links a.active {
+            color: var(--primary-light);
+            border-bottom: 2px solid var(--primary-light);
+        }
+        
+        .wiki-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            gap: 30px;
+            flex: 1;
+        }
+        
+        .infobox {
+            width: 320px;
+            flex-shrink: 0;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            align-self: flex-start;
+        }
+        
+        .infobox-title {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .infobox-image {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .effect-icon-img {
+            width: 64px;
+            height: 64px;
+            image-rendering: pixelated;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .effect-color {
+            width: 100%;
+            height: 20px;
+            background-color: #e9b8b3;
+            border-radius: 4px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+        }
+        
+        .infobox-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        
+        .infobox-table th,
+        .infobox-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        
+        .infobox-table th {
+            color: var(--primary-dark);
+            font-weight: 600;
+            text-align: left;
+            white-space: nowrap;
+            width: 40%;
+        }
+        
+        .infobox-table td {
+            color: var(--text);
+            word-break: break-word;
+        }
+        
+        .content {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+        
+        .content h1 {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        
+        .content h2 {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        
+        .content h3 {
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        
+        .content p {
+            margin-bottom: 15px;
+        }
+        
+        .content ul {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .content li {
+            margin-bottom: 5px;
+        }
+        
+        .achievement-advancement {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .achievement-card {
+            flex: 1;
+            min-width: 200px;
+            background: #f0f8ff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .history-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .history-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .history-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .footer {
+            background: #1a1a2e;
+            color: #cccccc;
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            border-top: 3px solid var(--primary-light);
+        }
+        
+        .footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+        
+        @media (max-width: 900px) {
+            .wiki-container {
+                flex-direction: column;
+            }
+            .infobox {
+                width: 100%;
+            }
+        }
+        
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('https://fonts.cdnfonts.com/s/14550/Minecraft.woff') format('woff');
+        }
+    </style>
+
+    <!-- 统一资源配置区 -->
+    <script>
+        window.wikiAssets = {
+            images: {
+                // 效果图标：你可以替换成自己的本地图片，例如 '../images/effect/unstable_teleport.png'
+                unstableTeleportIcon: 'https://zh.minecraft.wiki/images/Invicon_Ender_Pearl.png?61f62',
+                placeholder: 'https://via.placeholder.com/64?text=Missing'
+            }
+        };
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="../../index.html" class="navbar-logo">
+            <span>Wonderful Minecraft</span>
+        </a>
+        <div class="navbar-links">
+            <a href="../../index.html">首页</a>
+            <a href="../main.html" class="active">Wiki</a>
+            <a href="#">关于</a>
+            <a href="#">社区</a>
+        </div>
+    </nav>
+
+    <div class="wiki-container">
+        <main class="content">
+            <h1>不稳定传送</h1>
+            <p><strong>不稳定传送（Unstable Teleport）</strong>是一种会导致持有者每0.75秒随机传送一次并受到虚空伤害的状态效果。</p>
+
+            <h2>效果</h2>
+            <p>受影响生物每15游戏刻（0.75秒）会触发一次随机传送：以当前位置为中心，在X/Z轴±3.5格、Y轴±5格范围内随机选取一个落点，并将生物传送过去。传送后会在起点和终点生成紫色传送门粒子，并播放末影人传送音效（<code>ender_man.teleport</code>）和紫颂果传送音效（<code>chorus_fruit.teleport</code>）。</p>
+            <p>每次传送后，生物会受到4点虚空伤害（❤❤），如果该生物当前生命值低于最大生命值的25%，则伤害减半为2点。该伤害类型为虚空伤害（<code>out_of_world</code>），无法被护甲减免，但可以被抗性提升或伤害吸收效果抵消部分。</p>
+            <p>此外，拥有此效果的玩家<strong>无法使用</strong>以下物品：末影珍珠、盾牌、雪球、鸡蛋、钓鱼竿、三叉戟、弓、弩。尝试使用这些物品时会被强制阻止，并显示失败动画。</p>
+
+            <h2>来源</h2>
+            <p>不稳定传送效果目前只能通过以下方式获得：</p>
+            <h3>末影传送剑</h3>
+            <p><strong>末影传送剑（Ender Teleportation Sword）</strong>击中任何生物（包括玩家）时，会为目标施加8秒（160游戏刻）的不稳定传送效果I级。该武器由<strong>revivalcorpse</strong>模组添加，可在创造模式战斗标签页或通过合成获得（暂未开放生存合成，只能从创造模式获取）。</p>
+            <table class="infobox-table" style="margin: 15px 0; width: 100%;">
+                <thead>
+                    <tr>
+                        <th>来源</th>
+                        <th>效果等级</th>
+                        <th>时长</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>末影传送剑攻击</td>
+                        <td>I</td>
+                        <td>0:08 (8秒)</td>
+                        <td>每次击中目标都会刷新持续时间</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>目前没有其他途径（药水、命令等）能够获得此效果，但模组开发者未来可能增加对应的药水或效果箭。</p>
+
+            <h2>免疫的生物</h2>
+            <p>该效果可作用于几乎所有生物（包括玩家、怪物、动物等），没有特殊免疫的生物。但末影龙和凋灵等Boss生物虽然可以被施加效果，由于它们拥有传送抗性和高生命值，实际影响较小。</p>
+
+            <h2>数据值</h2>
+            <h3>ID</h3>
+            <table class="infobox-table" style="margin: 15px 0;">
+                <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>命名空间ID</th>
+                        <th>本地化键名</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>不稳定传送</td>
+                        <td><code>revivalcorpse:unstable_teleport</code></td>
+                        <td><code>effect.revivalcorpse.unstable_teleport</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>颜色</h3>
+            <p>该效果的粒子颜色为浅粉色（RGB: 233, 184, 179），对应十六进制 <code>#e9b8b3</code>。</p>
+
+            <h2>历史</h2>
+            <ul class="history-list">
+                <li><strong>revivalcorpse 1.0.0</strong> — 加入了不稳定传送效果及其来源末影传送剑。</li>
+                <li>效果触发时会对生物造成虚空伤害，并禁止使用部分投掷/远程物品。</li>
+                <li>每次传送都会产生大量传送门粒子和两种传送音效。</li>
+                <li>当目标生命值低于25%时，每次传送伤害减半。</li>
+            </ul>
+
+            <h2>你知道吗</h2>
+            <ul>
+                <li>玩家在拥有此效果时无法使用末影珍珠，这正好防止了玩家通过末影珍珠打断传送循环。</li>
+            </ul>
+            <p style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 10px; font-style: italic;">不稳定传送是模组 <strong>revivalcorpse</strong> 添加的状态效果，更多内容请查阅模组文档。</p>
+        </main>
+
+        <aside class="infobox">
+            <div class="infobox-title">不稳定传送</div>
+            <div class="infobox-image">
+                <!-- 使用 img 标签引用图标，通过 data-asset-img 让脚本填充 -->
+                <img class="effect-icon-img" data-asset-img="unstableTeleportIcon" alt="不稳定传送图标">
+                <div class="effect-color"></div>
+                <div style="margin-top: 8px; font-size:0.8rem;">颜色 #e9b8b3</div>
+            </div>
+            <table class="infobox-table">
+                <tr>
+                    <th>类型</th>
+                    <td>中性（Beneficial）<br><span style="font-size:0.8rem;">注：实际效果对生物有害</span></td>
+                </tr>
+                <tr>
+                    <th>即时生效</th>
+                    <td>否</td>
+                </tr>
+                <tr>
+                    <th>免疫的生物</th>
+                    <td>无特殊免疫</td>
+                </tr>
+                <tr>
+                    <th>状态效果ID</th>
+                    <td>revivalcorpse:unstable_teleport</td>
+                </tr>
+                <tr>
+                    <th>模组</th>
+                    <td>revivalcorpse</td>
+                </tr>
+            </table>
+        </aside>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 Wonderful Minecraft | 内容采用 <a href="#">CC BY-NC-SA 3.0</a> 授权</p>
+        <p>本网站与 Mojang 或 Microsoft 无从属关系 | revivalcorpse 模组非官方Wiki</p>
+        <p><a href="../index.html">返回首页</a> | <a href="./main.html">返回Wiki主页</a></p>
+    </footer>
+
+    <!-- ========== 资源注入脚本：根据配置填充图片 ========== -->
+    <script>
+        (function() {
+            const assets = window.wikiAssets;
+            if (!assets) return;
+            // 处理所有带 data-asset-img 的图片
+            document.querySelectorAll('img[data-asset-img]').forEach(img => {
+                const key = img.getAttribute('data-asset-img');
+                if (assets.images && assets.images[key]) {
+                    img.src = assets.images[key];
+                }
+                // 可选：备用图片处理
+                const fallbackKey = img.getAttribute('data-fallback');
+                if (fallbackKey && assets.images && assets.images[fallbackKey]) {
+                    img.onerror = function() {
+                        this.src = assets.images[fallbackKey];
+                    };
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>
