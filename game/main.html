@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏大厅 - Wonderful Minecraft</title>
+    <style>
+         :root {
+            --primary: #1c9dd5;
+            --primary-dark: #006699;
+            --primary-light: #4db8ff;
+            --bg: #e6f7ff;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text: #222;
+            --text-light: #444;
+            --border: #b3d9ff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(230, 247, 255, 0.9), rgba(230, 247, 255, 0.9)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="50" height="50" fill="%23c2e6ff"/><rect x="50" y="50" width="50" height="50" fill="%23c2e6ff"/></svg>');
+            display: flex;
+            flex-direction: column;
+        }
+        /* 导航栏 - 与 Wiki 完全一致 */
+        
+        .navbar {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--primary-light);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .navbar-logo img {
+            height: 40px;
+            width: auto;
+        }
+        
+        .navbar-logo span {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 1.8rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(77, 184, 255, 0.6);
+            letter-spacing: 2px;
+        }
+        
+        .navbar-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .navbar-links a {
+            color: #dddddd;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.2s;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        
+        .navbar-links a:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .navbar-links a.active {
+            color: var(--primary-light);
+            border-bottom: 2px solid var(--primary-light);
+        }
+        /* 主容器 */
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+        /* 欢迎区块 */
+        
+        .welcome-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 248, 255, 0.95) 100%);
+            border-radius: 16px;
+            padding: 40px 30px;
+            margin-bottom: 35px;
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        
+        .welcome-title {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 3rem;
+            color: var(--primary-dark);
+            text-shadow: 2px 2px 0 #b3e0ff;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.4rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        /* 卡片网格 - 游戏卡片样式 */
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px 20px;
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+        
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: rgba(77, 184, 255, 0.15);
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .card-title {
+            font-family: 'Minecraft', 'Segoe UI', sans-serif;
+            font-size: 1.6rem;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .card-desc {
+            font-size: 1rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+        /* 特殊高亮卡片（炸弹游戏） */
+        
+        .card-special {
+            border: 3px solid #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+            box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
+        }
+        
+        .card-special .card-icon {
+            background: rgba(255, 68, 68, 0.2);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);
+            }
+        }
+        /* 页脚 */
+        
+        .footer {
+            background: #1a1a2e;
+            color: #cccccc;
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            border-top: 3px solid var(--primary-light);
+        }
+        
+        .footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+        /* 浮动方块背景 */
+        
+        .floating-cubes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .cube {
+            position: absolute;
+            background-color: rgba(77, 184, 255, 0.25);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        /* 响应式 */
+        
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2.2rem;
+            }
+            .navbar-links {
+                display: none;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('https://fonts.cdnfonts.com/s/14550/Minecraft.woff') format('woff');
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-cubes" id="cubes-container"></div>
+
+    <!-- 导航栏 - 与 Wiki 完全一致 -->
+    <nav class="navbar">
+        <a href="../index.html" class="navbar-logo">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%234db8ff'/%3E%3Crect x='5' y='5' width='30' height='30' fill='%231c9dd5'/%3E%3Crect x='15' y='15' width='10' height='10' fill='%23fff'/%3E%3C/svg%3E"
+                alt="Logo">
+            <span>Wonderful Minecraft</span>
+        </a>
+        <div class="navbar-links">
+            <a href="../index.html">首页</a>
+            <a href="../wiki/main.html">Wiki</a>
+            <a href="#" class="active">游戏大厅</a>
+            <a href="#">关于</a>
+            <a href="#">社区</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 欢迎区块 -->
+        <section class="welcome-section">
+            <h1 class="welcome-title">🎮 游戏大厅</h1>
+            <p class="welcome-subtitle">选择你的冒险，挑战心跳极限</p>
+        </section>
+
+        <!-- 游戏卡片网格 -->
+        <div class="card-grid">
+            <!-- 炸弹游戏卡片 - 高亮特殊样式 -->
+            <a href="./bomb_num/bomb_num.html" class="card card-special">
+                <div class="card-icon">💣</div>
+                <h3 class="card-title">数字炸弹</h3>
+                <p class="card-desc">与 AI 轮番猜数，限时 4 秒，猜中即炸！紧张刺激的脑力对决。</p>
+            </a>
+
+            <!-- 预留更多游戏卡片（可扩展） -->
+            <a href="#" class="card">
+                <div class="card-icon">⚔️</div>
+                <h3 class="card-title">剑术对决</h3>
+                <p class="card-desc">即将开放，像素竞技场一决高下。</p>
+            </a>
+            <a href="#" class="card">
+                <div class="card-icon">🏰</div>
+                <h3 class="card-title">建筑挑战</h3>
+                <p class="card-desc">限时搭建，创意与速度的比拼。</p>
+            </a>
+            <a href="#" class="card">
+                <div class="card-icon">🐉</div>
+                <h3 class="card-title">屠龙试炼</h3>
+                <p class="card-desc">合作击败末影龙，团队配合练习。</p>
+            </a>
+        </div>
+
+        <!-- 近期热门游戏动态 -->
+        <section class="welcome-section" style="text-align: left;">
+            <h2 style="font-family: 'Minecraft','Segoe UI',sans-serif; color: var(--primary-dark); margin-bottom: 15px;">📢 热门推荐</h2>
+            <ul style="list-style: none; padding-left: 0;">
+                <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                    <strong><a href="../bomb_num/bomb_num.html" style="color: var(--primary-dark);">数字炸弹</a></strong> - 全新 AI 对战模式，超时即败，挑战你的心理极限！
+                </li>
+                <li style="padding: 10px 0; border-bottom: 1px solid var(--border);">
+                    <strong>社区锦标赛</strong> - 即将开启，敬请期待。
+                </li>
+                <li style="padding: 10px 0;">
+                    <strong>游戏反馈</strong> - 加入 Discord 提交你的创意，让游戏大厅更丰富。
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 Wonderful Minecraft | 内容采用 <a href="#">CC BY-NC-SA 3.0</a> 授权</p>
+        <p>本网站与 Mojang 或 Microsoft 无从属关系</p>
+        <p><a href="../index.html">返回首页</a> | <a href="../wiki/main.html">访问 Wiki</a></p>
+    </footer>
+
+    <script>
+        // 浮动方块背景（与 Wiki 一致）
+        document.addEventListener('DOMContentLoaded', function() {
+            const cubesContainer = document.getElementById('cubes-container');
+            for (let i = 0; i < 25; i++) {
+                const cube = document.createElement('div');
+                cube.classList.add('cube');
+                cube.style.width = `${Math.random() * 20 + 10}px`;
+                cube.style.height = cube.style.width;
+                cube.style.left = `${Math.random() * 100}vw`;
+                cube.style.top = `${Math.random() * 100}vh`;
+                cube.style.backgroundColor = ['#4db8ff', '#66ccff', '#3399ff', '#99ddff', '#00aaff'][Math.floor(Math.random() * 5)];
+                cube.style.animationDelay = `${Math.random() * 15}s`;
+                cube.style.animationDuration = `${Math.random() * 10 + 15}s`;
+                cubesContainer.appendChild(cube);
+            }
+        });
+    </script>
+</body>
+
+</html>

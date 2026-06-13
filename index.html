@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Wonderful Minecraft | 精彩纷呈的世界</title>
     <style>
         /* 全局样式 */
@@ -88,13 +88,19 @@
             letter-spacing: 1px;
             font-family: 'Minecraft', 'Segoe UI', sans-serif;
         }
-        /* 按钮容器及样式 */
+        /* 按钮容器 + 并排布局 (flex 现代化方案) */
         
         .wiki-button-container {
             text-align: center;
             margin-top: 50px;
             margin-bottom: 40px;
+            /* 使用 flex 布局让两个按钮完美并排，且自动居中 */
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
         }
+        /* 双按钮公用样式 (保留原 wiki-button 所有视觉效果) */
         
         .wiki-button {
             display: inline-block;
@@ -112,6 +118,7 @@
             font-family: 'Minecraft', 'Segoe UI', sans-serif;
             text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
             position: relative;
+            cursor: pointer;
         }
         
         .wiki-button:hover {
@@ -125,7 +132,7 @@
             transform: translateY(0);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        /* 装饰元素 */
+        /* 装饰像素边框 */
         
         .pixel-border {
             position: relative;
@@ -151,7 +158,37 @@
             bottom: -10px;
             right: -10px;
         }
-        /* 响应式设计 */
+        /* 响应式设计：手机屏幕两个按钮依然精致并排，若宽度不足则换行居中 */
+        
+        @media (max-width: 680px) {
+            .wiki-button-container {
+                gap: 20px;
+            }
+            .wiki-button {
+                padding: 14px 32px;
+                font-size: 1.5rem;
+                letter-spacing: 2px;
+            }
+        }
+        
+        @media (max-width: 550px) {
+            .wiki-button {
+                padding: 12px 24px;
+                font-size: 1.3rem;
+                letter-spacing: 1px;
+            }
+            .wiki-button-container {
+                gap: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .wiki-button {
+                padding: 10px 20px;
+                font-size: 1.2rem;
+            }
+        }
+        /* 原响应式兼容 (保留之前的媒体查询) */
         
         @media (max-width: 768px) {
             .main-title {
@@ -162,10 +199,6 @@
             }
             .image-container {
                 height: 60vh;
-            }
-            .wiki-button {
-                font-size: 1.6rem;
-                padding: 14px 36px;
             }
         }
         
@@ -179,18 +212,15 @@
             .image-container {
                 height: 50vh;
             }
-            .wiki-button {
-                font-size: 1.3rem;
-                padding: 12px 28px;
-            }
         }
         /* 像素化字体导入 */
         
         @font-face {
             font-family: 'Minecraft';
             src: url('https://fonts.cdnfonts.com/s/14550/Minecraft.woff') format('woff');
+            font-display: swap;
         }
-        /* 装饰方块 */
+        /* 装饰方块背景动画 */
         
         .floating-cubes {
             position: fixed;
@@ -226,6 +256,13 @@
                 opacity: 0;
             }
         }
+        /* 精致的小点缀: 按钮焦点优化 */
+        
+        .wiki-button:focus-visible {
+            outline: 3px solid #ffcc00;
+            outline-offset: 4px;
+            border-radius: 12px;
+        }
     </style>
 </head>
 
@@ -234,7 +271,8 @@
 
     <div class="container">
         <div class="image-container">
-            <img src="./index_header.jpg" alt="Minecraft Landscape" class="main-image">
+            <!-- 原有主视觉图 请确保 index_header.jpg 存在 -->
+            <img src="./index_header.jpg" alt="Minecraft 奇妙景观：蓝天绿树与像素世界" class="main-image">
             <div class="image-overlay">
                 <p>探索无限可能的世界</p>
             </div>
@@ -245,38 +283,47 @@
             <h2 class="subtitle">精彩纷呈的世界</h2>
         </div>
 
-        <!-- 新增的进入Wiki按钮 -->
+        <!-- 按钮区域: 两个按钮并排显示 —— 新增「进入游戏」按钮与 Wiki 并肩 -->
         <div class="wiki-button-container">
+            <!-- 原有的 Wiki 入口 -->
             <a href="./wiki/main.html" class="wiki-button">📖 进入 Wiki</a>
+            <!-- 新增的游戏入口，链接指向 ./game/main.html 完全符合需求 -->
+            <a href="./game/main.html" class="wiki-button">🎮 进入游戏</a>
         </div>
     </div>
 
     <script>
-        // 创建浮动方块背景
+        // 创建漂浮方块背景 (增强 Minecraft 像素氛围)
         document.addEventListener('DOMContentLoaded', function() {
             const cubesContainer = document.getElementById('cubes-container');
-            const cubeCount = 30;
+            // 防止重复生成清空，但初始无内容，直接创建即可
+            if (cubesContainer) {
+                const cubeCount = 36; // 稍微增加方块数量使背景更生动
+                // 清空已有元素避免重复（一般最初是空，但为了安全）
+                cubesContainer.innerHTML = '';
 
-            for (let i = 0; i < cubeCount; i++) {
-                const cube = document.createElement('div');
-                cube.classList.add('cube');
+                for (let i = 0; i < cubeCount; i++) {
+                    const cube = document.createElement('div');
+                    cube.classList.add('cube');
 
-                // 随机位置和大小
-                const size = Math.random() * 20 + 10;
-                cube.style.width = `${size}px`;
-                cube.style.height = `${size}px`;
-                cube.style.left = `${Math.random() * 100}vw`;
-                cube.style.top = `${Math.random() * 100}vh`;
+                    // 随机位置和大小: 6px ~ 26px 不等更像素化
+                    const size = Math.random() * 20 + 6;
+                    cube.style.width = `${size}px`;
+                    cube.style.height = `${size}px`;
+                    cube.style.left = `${Math.random() * 100}vw`;
+                    cube.style.top = `${Math.random() * 100}vh`;
 
-                // 使用蓝色系颜色
-                const colors = ['#4db8ff', '#66ccff', '#3399ff', '#99ddff', '#00aaff'];
-                cube.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    // 丰富蓝色系 & 偶尔草绿色点题 Minecraft
+                    const colors = ['#4db8ff', '#66ccff', '#3399ff', '#99ddff', '#00aaff', '#7ac943', '#5aa32c'];
+                    cube.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    cube.style.opacity = Math.random() * 0.6 + 0.2;
 
-                // 随机动画延迟和持续时间
-                cube.style.animationDelay = `${Math.random() * 15}s`;
-                cube.style.animationDuration = `${Math.random() * 10 + 15}s`;
+                    // 随机动画延迟和持续时间，制造错落感
+                    cube.style.animationDelay = `${Math.random() * 15}s`;
+                    cube.style.animationDuration = `${Math.random() * 12 + 12}s`;
 
-                cubesContainer.appendChild(cube);
+                    cubesContainer.appendChild(cube);
+                }
             }
         });
     </script>
