@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MC 知识问答 · 挑战版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        
+        body {
+            background: #0a0a1a;
+            color: #e0e8ff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(#1a1a3a, #0a0a1a);
+            padding: 16px;
+            transition: transform 0.1s;
+        }
+        
+        body.shake {
+            animation: bodyShake 0.12s infinite;
+        }
+        
+        @keyframes bodyShake {
+            0% {
+                transform: translate(2px, 2px);
+            }
+            25% {
+                transform: translate(-2px, -2px);
+            }
+            50% {
+                transform: translate(2px, -2px);
+            }
+            75% {
+                transform: translate(-2px, 2px);
+            }
+            100% {
+                transform: translate(2px, 2px);
+            }
+        }
+        /* 引导页 */
+        
+        .full-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0a0a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .full-screen .big-text {
+            font-size: 38px;
+            color: #5c9eff;
+            text-shadow: 0 0 20px #3a7bd5;
+            max-width: 90%;
+            line-height: 1.5;
+        }
+        
+        .full-screen .skip-hint {
+            position: absolute;
+            bottom: 50px;
+            font-size: 18px;
+            color: #667;
+        }
+        /* 主标题 */
+        
+        .main-title {
+            font-size: 38px;
+            color: #5c9eff;
+            text-shadow: 0 0 20px #3a7bd5;
+            animation: flash 0.8s infinite alternate;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        @keyframes flash {
+            from {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
+        /* 游戏面板 */
+        
+        .game-panel {
+            width: 96%;
+            max-width: 860px;
+            background: #141430;
+            border: 2px solid #3a7bd5;
+            border-radius: 18px;
+            padding: 22px 18px;
+            box-shadow: 0 0 40px #3a7bd566;
+            margin: 8px 0;
+        }
+        /* 状态栏：进度、血量、计时 */
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .status-bar .progress {
+            color: #aabbdd;
+        }
+        
+        .status-bar .hearts {
+            color: #ff4466;
+            font-size: 26px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 12px #ff446688;
+        }
+        
+        .status-bar .timer {
+            background: #1e1e44;
+            padding: 6px 22px;
+            border-radius: 40px;
+            border: 3px solid #5c9eff;
+            color: #5c9eff;
+            font-size: 36px;
+            font-weight: 900;
+            min-width: 80px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(92, 158, 255, 0.15);
+        }
+        
+        .status-bar .timer.warning {
+            color: #ff6644;
+            border-color: #ff6644;
+            animation: timerPulse 0.4s infinite alternate;
+            box-shadow: 0 0 40px rgba(255, 100, 68, 0.4);
+        }
+        
+        .status-bar .timer.danger {
+            color: #ff2222;
+            border-color: #ff2222;
+            animation: timerPulse 0.25s infinite alternate;
+            box-shadow: 0 0 60px rgba(255, 0, 0, 0.6);
+        }
+        
+        @keyframes timerPulse {
+            from {
+                opacity: 0.6;
+                transform: scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1.08);
+            }
+        }
+        /* 题目区 */
+        
+        .q-type {
+            color: #ffcc44;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .q-text {
+            font-size: 22px;
+            line-height: 1.6;
+            margin: 8px 0 16px 0;
+            min-height: 56px;
+            color: #e8eeff;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .main-title {
+                font-size: 28px;
+            }
+            .q-text {
+                font-size: 18px;
+            }
+            .status-bar {
+                font-size: 15px;
+            }
+            .status-bar .timer {
+                font-size: 28px;
+                min-width: 60px;
+                padding: 4px 14px;
+            }
+        }
+        
+        .option-btn {
+            background: #1e1e44;
+            border: 2px solid #3a5a8a;
+            border-radius: 10px;
+            padding: 12px 12px;
+            color: #c8d8ff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 46px;
+            word-break: break-word;
+        }
+        
+        .option-btn:hover:not(:disabled) {
+            background: #2a3a6a;
+            border-color: #5c9eff;
+            transform: scale(1.02);
+        }
+        
+        .option-btn .letter {
+            color: #5c9eff;
+            font-weight: bold;
+            min-width: 24px;
+        }
+        
+        .option-btn.selected {
+            background: #2a4a7a;
+            border-color: #88bbff;
+        }
+        
+        .option-btn.correct-reveal {
+            background: #1a6a3a;
+            border-color: #44dd88;
+        }
+        
+        .option-btn.wrong-reveal {
+            background: #6a1a2a;
+            border-color: #ff4466;
+        }
+        
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .feedback-area {
+            margin: 14px 0 10px 0;
+            font-size: 20px;
+            min-height: 36px;
+            font-weight: bold;
+        }
+        
+        .feedback-area.correct {
+            color: #44dd88;
+        }
+        
+        .feedback-area.wrong {
+            color: #ff4466;
+        }
+        
+        .feedback-area.timeout {
+            color: #ff8844;
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 8px 0 4px 0;
+        }
+        
+        button {
+            padding: 10px 28px;
+            font-size: 18px;
+            background: #2a5a8a;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        
+        button:hover:not(:disabled) {
+            background: #3a7ad5;
+            transform: scale(1.04);
+        }
+        
+        button:disabled {
+            background: #445566;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        button.btn-primary {
+            background: #3a7ad5;
+        }
+        
+        button.btn-primary:hover:not(:disabled) {
+            background: #5c9eff;
+        }
+        
+        button.btn-danger {
+            background: #aa3344;
+        }
+        
+        button.btn-danger:hover:not(:disabled) {
+            background: #cc4455;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        /* 失败页 —— 黑底红字 */
+        
+        .fail-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .fail-overlay .fail-title {
+            font-size: 64px;
+            color: #ff2222;
+            text-shadow: 0 0 40px #ff0000;
+            font-weight: 900;
+            animation: flash 0.5s infinite alternate;
+            line-height: 1.3;
+        }
+        
+        .fail-overlay .fail-sub {
+            font-size: 34px;
+            color: #ff4444;
+            margin-top: 16px;
+            text-shadow: 0 0 20px #ff000066;
+            font-weight: bold;
+        }
+        
+        .fail-overlay .fail-tip {
+            font-size: 22px;
+            color: #aa5555;
+            margin-top: 40px;
+            letter-spacing: 3px;
+        }
+        /* 结果页（过关） */
+        
+        .result-box {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .result-box .big-score {
+            font-size: 64px;
+            color: #ffcc44;
+            text-shadow: 0 0 30px #ff8800;
+        }
+        
+        .result-box .detail {
+            font-size: 20px;
+            color: #aabbdd;
+            margin: 10px 0;
+        }
+        
+        .result-box .star {
+            font-size: 48px;
+            margin: 8px 0;
+        }
+        /* 自动进入下一题的倒计时指示器 */
+        
+        .auto-next-indicator {
+            display: inline-block;
+            margin-top: 6px;
+            font-size: 16px;
+            color: #667799;
+            letter-spacing: 1px;
+        }
+        
+        .auto-next-indicator span {
+            color: #5c9eff;
+            font-weight: bold;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 引导页 -->
+    <div class="full-screen" id="page1">
+        <div class="big-text" id="text1"></div>
+        <div class="skip-hint">点击任意位置继续</div>
+    </div>
+    <div class="full-screen" id="page2" style="display:none;">
+        <div class="big-text" id="text2"></div>
+        <div class="skip-hint">点击任意位置继续</div>
+    </div>
+    <div class="full-screen" id="page3" style="display:none;">
+        <div class="big-text" id="text3"></div>
+        <div class="skip-hint">点击任意位置继续</div>
+    </div>
+    <div class="full-screen" id="page4" style="display:none;">
+        <div class="big-text" id="text4"></div>
+        <div class="skip-hint">点击任意位置继续</div>
+    </div>
+    <div class="full-screen" id="page5" style="display:none;">
+        <div class="big-text" id="text5"></div>
+        <div class="skip-hint">点击任意位置开始挑战</div>
+    </div>
+
+    <!-- 失败覆盖层 -->
+    <div class="fail-overlay" id="failOverlay" style="display:none;">
+        <div class="fail-title">💀 你死了！<br>你的膀胱彻底放松，接受惩罚吧</div>
+        <div class="fail-sub">——自觉直接尿裤子吧！！</div>
+        <div class="fail-tip" id="failReason">！你的膀胱已耗尽所有力气！</div>
+    </div>
+
+    <!-- 主界面 -->
+    <h1 class="main-title" id="gameTitle" style="display:none;">⛏️ MC 知识问答 · 生存挑战</h1>
+
+    <div class="game-panel" id="gamePanel" style="display:none;">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span class="progress" id="progressText">第 1 / 20 题</span>
+            <span class="hearts" id="heartsDisplay">❤️❤️❤️❤️❤️</span>
+            <span class="timer" id="timerDisplay">15</span>
+        </div>
+
+        <!-- 题目 -->
+        <div class="q-type" id="qType">📖 单选题</div>
+        <div class="q-text" id="qText">加载题目中...</div>
+
+        <div class="options-grid" id="optionsContainer"></div>
+
+        <div class="feedback-area" id="feedbackText">&nbsp;</div>
+
+        <div class="btn-group">
+            <button id="confirmBtn" disabled>确认答案</button>
+            <button id="restartBtn" class="btn-danger hidden">🔄 重新开始</button>
+        </div>
+
+        <div class="auto-next-indicator hidden" id="autoNextIndicator">
+            下一题倒计时：<span id="autoNextCountdown">3</span>s
+        </div>
+    </div>
+
+    <!-- 过关结果页 -->
+    <div class="game-panel" id="resultPanel" style="display:none;">
+        <div class="result-box">
+            <div class="star" id="resultStar">⭐</div>
+            <div class="big-score" id="resultScore">20 / 20</div>
+            <div class="detail" id="resultDetail">完美通关！</div>
+            <div class="detail" style="font-size:16px;color:#667799;" id="resultComment">你真是 MC 大师！</div>
+            <br>
+            <button id="resultRestartBtn" class="btn-primary">🔄 再来一次</button>
+        </div>
+    </div>
+
+    <!-- 音频 -->
+    <!-- Wiki 音频（答错播放） -->
+    <audio id="hurtBerryAudio" preload="auto">
+        <source src="https://zh.minecraft.wiki/images/Player_hurt_sweet_berry_bush2.ogg?98500" type="audio/ogg">
+    </audio>
+    <!-- Wiki 音频（失败播放） -->
+    <audio id="hurt3Audio" preload="auto">
+        <source src="https://zh.minecraft.wiki/images/Player_hurt3.ogg?98500" type="audio/ogg">
+    </audio>
+    <!-- 本地音频（失败播放） -->
+    <audio id="deathAudio1" preload="auto">
+        <source src="./sound_death.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="deathAudio2" preload="auto">
+        <source src="./sound_death2.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // ============================================================
+        // 题库 —— 完全基于你提供的新题目列表（40+ 题）
+        // ============================================================
+        const FULL_BANK = [
+            // ==================== 世界生成（地形生成） ====================
+            {
+                type: 'single',
+                question: 'Minecraft Java版中，一个区块从无到有共需要经历几个生成阶段？',
+                options: ['3个', '4个', '5个', '6个', '7个', '8个', '9个', '10个'],
+                answer: [3]
+            }, {
+                type: 'single',
+                question: '世界生成中，使用相同种子时为保证生成相同的世界，算法总数可达约多少种？',
+                options: ['2^32', '2^48', '2^56', '2^64', '2^72', '2^80', '2^88', '2^96'],
+                answer: [3]
+            }, {
+                type: 'single',
+                question: '以下哪个不是主世界生物群系放置所使用的密度函数？',
+                options: ['温度', '湿度', '大陆性', '侵蚀度', '奇异性', '深度', '偏移值', '高度'],
+                answer: [6]
+            }, {
+                type: 'single',
+                question: '主世界生物群系放置中，温度密度函数的取值范围被划分为几个等级？',
+                options: ['3个', '4个', '5个', '6个', '7个', '8个', '9个', '10个'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: 'Java版中，可在调试屏幕的哪一行找到六个密度函数值？',
+                options: ['BiomeBlender', 'NoiseRouter', 'ClimateSampler', 'TerrainGenerator', 'ChunkGenerator', 'WorldGenSettings', 'DimensionOptions', 'BiomeSource'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '主世界生物群系放置中，大陆性密度函数的取值范围为多少？',
+                options: ['-2.22~2.22', '-1.69~1.69', '-3.66~3.66', '-2.0~2.0', '-4.0~4.0', '-1.0~1.0', '-5.0~5.0', '-0.5~0.5'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '下界生物群系放置中，使用了几个密度函数？',
+                options: ['1个', '2个', '3个', '4个', '5个', '6个', '7个', '8个'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '玄武岩三角洲在下界生物群系放置中的温度值为多少？',
+                options: ['0.4', '0', '-0.5', '0.175', '-0.2', '0.3', '-0.8', '0.6'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '主世界生物群系放置中，大陆性值非常低时会产生什么生物群系？',
+                options: ['深海', '海洋', '蘑菇岛', '沿岸', '平原', '沙漠', '丛林', '冻原'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '关于世界生成阶段，以下说法正确的是？',
+                options: ['玩家不可见的区块一定都是原型区块', '原型区块是指已经生成完毕的区块', '世界区块是指玩家可以访问的区块', '区块加载后直接进入最高生成阶段', '原型区块不会占用内存', '所有区块的生成阶段相同', '玩家可见范围内一定有原型区块', '世界生成是实时完成的'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '主世界生物群系放置中，湿度密度函数的取值范围被划分为几个等级？',
+                options: ['3个', '4个', '5个', '6个', '7个', '8个', '9个', '10个'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '主世界生物群系放置中，侵蚀度越低会产生什么类型的生物群系？',
+                options: ['更平坦的生物群系', '更陡峭崎岖的生物群系', '更多海洋生物群系', '更多沙漠生物群系', '更多丛林生物群系', '更多冻原生物群系', '更多蘑菇岛', '更多平原'],
+                answer: [1]
+            },
+
+            // ==================== 寻路 ====================
+            {
+                type: 'single',
+                question: 'Minecraft中，游戏将寻路系统分为几类？',
+                options: ['1类', '2类', '3类', '4类', '5类', '6类', '7类', '8类'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '以下哪种生物使用的是水中寻路系统？',
+                options: ['僵尸', '骷髅', '海豚', '末影人', '苦力怕', '蜘蛛', '狼', '狐狸'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '寻路系统中，方块默认节点类型为BLOCKED代表什么？',
+                options: ['可以通过但代价较高', '无法寻路', '只能飞行通过', '只能游泳通过', '需要跳跃通过', '需要破坏方块', '只能由特定生物通过', '始终为OPEN'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '寻路系统中，嘎枝不允许寻路远离嘎枝之心多少格外（欧几里得距离）？',
+                options: ['16格', '24格', '32格', '48格', '64格', '80格', '96格', '128格'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '关于路径节点代价，以下说法正确的是？',
+                options: ['负值代表可以通过', '正值代表不能通过', 'WALKABLE类型的代价为0', 'WATER类型的代价为0', 'BLOCKED类型的代价为0', '所有生物的节点代价相同', '代价越大越容易通过', '代价为负值时路径最短'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '以下哪种方块在寻路系统中的默认节点类型为RAIL？',
+                options: ['所有种类的铁轨', '所有种类的栅栏', '所有种类的墙', '所有种类的门', '所有种类的树叶', '所有种类的活板门', '所有种类的压力板', '所有种类的按钮'],
+                answer: [0]
+            }, {
+                type: 'single',
+                question: '关于水中寻路系统的生物相关节点类型，以下说法正确的是？',
+                options: ['判定包围盒内包含空气则节点类型为BLOCKED', '判定包围盒内包含含水方块则节点类型为WATER', '判定包围盒内包含不含水且不是水的方块则节点类型为BLOCKED', '水中寻路系统与地面寻路系统节点判定完全一致', '水中寻路系统无法进行任何地面寻路', '海豚搁浅后寻路系统会停止', '水中寻路系统可以计算地面路径节点', '所有水生生物使用相同的寻路系统'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '对于非水中寻路系统，如果生物可以开门也可以通过门，DOOR_WOOD_CLOSED环境相关类型会被修正为什么？',
+                options: ['BLOCKED', 'OPEN', 'WALKABLE_DOOR', 'DOOR_OPEN', 'FENCE', 'UNPASSABLE_RAIL', 'WATER', 'LAVA'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '监守者对UNPASSABLE_RAIL节点类型的代价为多少？',
+                options: ['-1', '0', '1', '2', '3', '4', '5', '8'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '地面寻路系统中，检查当前方块位置周围多少个方块进行环境相关节点类型计算？',
+                options: ['8个', '12个', '16个', '20个', '24个', '28个', '32个', '36个'],
+                answer: [4]
+            }, {
+                type: 'single',
+                question: '寻路系统中，以下哪个不是方块默认节点类型？',
+                options: ['OPEN', 'BLOCKED', 'WALKABLE', 'WATER', 'LAVA', 'FENCE', 'RAIL', 'DOOR_OPEN'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '对于非水中寻路系统，如果类型集合内包含FENCE，则生物相关节点类型为什么？',
+                options: ['OPEN', 'BLOCKED', 'FENCE', 'WALKABLE', 'UNPASSABLE_RAIL', 'BIG_MOBS_CLOSE_TO_DANGER', 'WATER', 'LAVA'],
+                answer: [2]
+            },
+
+            // ==================== 距离 ====================
+            {
+                type: 'single',
+                question: 'Minecraft中，一个方块的截面长度被定义为多少米？',
+                options: ['0.5米', '0.8米', '1米', '1.2米', '1.5米', '1.8米', '2米', '2.5米'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '以下哪种距离测量方式在游戏中最为精确？',
+                options: ['曼哈顿距离', '切比雪夫距离', '欧几里得距离', '水平距离', '垂直距离', '对角线距离', '投影距离', '曲面距离'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '游戏中光源（如火把）发出的光衰减规则使用哪种距离？',
+                options: ['欧几里得距离', '曼哈顿距离', '切比雪夫距离', '水平欧几里得距离', '垂直距离', '对角线距离', '投影距离', '曲面距离'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '红石线信号的扩散方式遵循哪种距离？',
+                options: ['水平欧几里得距离', '水平曼哈顿距离', '水平切比雪夫距离', '垂直距离', '对角线距离', '三维欧几里得距离', '三维曼哈顿距离', '三维切比雪夫距离'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '幽匿感测体的检测范围是什么形状？',
+                options: ['立方体', '曼哈顿球体', '欧几里得球体', '圆柱体', '八面体', '六面体', '圆锥体', '圆环体'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: 'Java版中，冰霜行者魔咒在当前位置周围多少格的欧几里得距离内生成霜冰？',
+                options: ['魔咒等级格', '魔咒等级+1格', '魔咒等级+2格', '魔咒等级+3格', '魔咒等级×2格', '魔咒等级×2+1格', '固定4格', '固定8格'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: 'Java版中，进度"它蔓延了"要求玩家击杀生物时，幽匿催发体在多少格欧几里得距离内？',
+                options: ['4格', '6格', '8格', '10格', '12格', '14格', '16格', '20格'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '基岩版中，幽匿催发体在生物死亡时触发的欧几里得距离为多少格？',
+                options: ['6格', '8格', '10格', '12格', '14格', '16格', '18格', '20格'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '液体在平面上自由流动时，可以流经该平面曼哈顿距离多少格内的所有方块？',
+                options: ['3格', '5格', '7格', '9格', '11格', '13格', '15格', '17格'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '喷溅药水破裂时的影响范围是半径为多少格的欧几里得球体？',
+                options: ['2格', '3格', '4格', '5格', '6格', '7格', '8格', '9格'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '不祥试炼刷怪笼每160游戏刻在半径多少格内生成不祥之物生成器？',
+                options: ['8格', '10格', '12格', '14格', '16格', '18格', '20格', '22格'],
+                answer: [3]
+            }, {
+                type: 'single',
+                question: '拉杆和按钮会在其周围曼哈顿距离为多少格的平面内发出红石信号？',
+                options: ['0格', '1格', '2格', '3格', '4格', '5格', '6格', '7格'],
+                answer: [1]
+            },
+
+            // ==================== 命令 ====================
+            {
+                type: 'single',
+                question: 'Java版中，命令执行后的储存值success只能为什么值？',
+                options: ['0或1', '0到255', '0到1024', '0到65535', '任意整数', '任意浮点数', '布尔值', '字符串'],
+                answer: [0]
+            }, {
+                type: 'single',
+                question: '基岩版中，命令的成功次数最大为多少？',
+                options: ['2,147,483,647', '1,073,741,823', '4,294,967,295', '65,535', '255', '1024', '65536', '无限'],
+                answer: [0]
+            }, {
+                type: 'single',
+                question: 'Java版中，以下哪个命令执行结果仅存在于/function命令？',
+                options: ['无法解析', '执行失败', '执行成功', 'Void', '执行中断', '执行出错', '超时', '跳过'],
+                answer: [3]
+            }, {
+                type: 'single',
+                question: '在专用服务器控制台中输入命令时，应该怎么做？',
+                options: ['必须加前缀/', '不能加前缀/', '加不加都可以', '必须加前缀!', '必须加前缀?', '必须加前缀$', '必须加前缀#', '不需要任何前缀'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: 'Java版中，以下哪个不属于命令执行的可能结果？',
+                options: ['无法解析', '执行失败', '执行成功', 'Void', '执行中断', '执行出错', '执行超时', '以上都是'],
+                answer: [6]
+            }, {
+                type: 'single',
+                question: '命令方块中执行命令时，前缀斜杠是必须的吗？',
+                options: ['必须', '不是必须的', '取决于命令类型', '取决于游戏版本', '取决于难度', '取决于世界类型', '取决于玩家权限', '取决于命令长度'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: 'Java版中，/execute命令在不包含if或unless子命令时，储存值的情况是？',
+                options: ['success为0，result为0', '没有这两个储存值', 'success为1，result为0', 'success为0，result为1', 'success为1，result为1', '取决于执行结果', '与子命令无关', '总是有储存值'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '以下哪个命令用于显示最近的给定结构的坐标？',
+                options: ['/find', '/search', '/locate', '/discover', '/explore', '/detect', '/scan', '/probe'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '技术上说，命令执行出错是指命令在执行时抛出了什么类型的异常？',
+                options: ['CommandSyntaxException', 'CommandParseException', '除CommandSyntaxException以外的异常', 'RuntimeException', 'IOException', 'NullPointerException', 'IllegalArgumentException', 'SecurityException'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '以下哪个命令用于修改方块或实体物品栏内的物品？',
+                options: ['/modify', '/change', '/item', '/edit', '/update', '/replace', '/set', '/swap'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '游戏规则命令/gamerule的权限等级为多少？',
+                options: ['0', '1', '2', '3', '4', '5', '6', '7'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '以下哪个命令用于开始或结束JFR分析？',
+                options: ['/jfr', '/profile', '/trace', '/analyze', '/jvm', '/debug', '/record', '/monitor'],
+                answer: [0]
+            },
+
+            // ==================== 物品格式 ====================
+            {
+                type: 'single',
+                question: '物品数据中，count标签的默认值是多少？',
+                options: ['0', '1', '2', '4', '8', '16', '32', '64'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '物品存储中，不带槽位存储的例子是什么？',
+                options: ['箱子中的物品', '玩家物品栏中的物品', '物品实体', '熔炉中的物品', '漏斗中的物品', '发射器中的物品', '酿造台中的物品', '潜影盒中的物品'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '物品至少拥有多少个默认组件？',
+                options: ['4个', '8个', '12个', '16个', '20个', '24个', '28个', '32个'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '以下哪个组件默认由光源方块拥有，且默认值为{"light": "15"}？',
+                options: ['block_state', 'banner_patterns', 'bees', 'bucket_entity_data', 'bundle_contents', 'charged_projectiles', 'consumable', 'enchantments'],
+                answer: [0]
+            }, {
+                type: 'single',
+                question: '在创造模式物品栏中，当物品现有组件与给定组件完全一致时，物品提示框中的分类文字以什么颜色显示？',
+                options: ['红色', '蓝色', '绿色', '黄色', '紫色', '青色', '白色', '灰色'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '以下哪个物品默认拥有enchantment_glint_override组件且值为true？',
+                options: ['钻石剑', '附魔金苹果', '下界之星', '末影珍珠', '烈焰棒', '下界疣', '金苹果', '钻石'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '物品格式中，components标签的作用是什么？',
+                options: ['存储物品的堆叠数量', '修改物品的数据组件信息', '存储物品的命名空间ID', '指定物品所在的槽位', '存储物品的耐久度', '存储物品的附魔信息', '存储物品的自定义名称', '存储物品的本地化键名'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '以下哪个组件默认由收纳袋拥有，且默认值为空列表？',
+                options: ['bundle_contents', 'bees', 'banner_patterns', 'charged_projectiles', 'bucket_entity_data', 'entity_data', 'fireworks', 'food'],
+                answer: [0]
+            }, {
+                type: 'single',
+                question: '物品格式中，!<数据组件ID>格式的作用是什么？',
+                options: ['添加一个数据组件', '使一个数据组件失效', '修改数据组件的值', '删除数据组件', '复制数据组件', '重命名数据组件', '排序数据组件', '合并数据组件'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '以下哪个组件默认由音乐唱片拥有？',
+                options: ['instrument', 'jukebox_playable', 'map_color', 'kinetic_weapon', 'glider', 'equippable', 'fireworks', 'food'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '以下哪个组件默认由鞘翅拥有？',
+                options: ['equippable', 'glider', 'instrument', 'kinetic_weapon', 'map_color', 'item_model', 'item_name', 'lore'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '物品格式中，id标签未指定时游戏会如何处理？',
+                options: ['报错并崩溃', '在加载区块时将其变更为空气', '默认为石头', '默认为泥土', '随机选择一个物品', '忽略该物品', '将该物品标记为无效', '生成一个占位物品'],
+                answer: [1]
+            },
+
+            // ==================== 魔咒 ====================
+            {
+                type: 'single',
+                question: '以下哪个魔咒属于宝藏型魔咒？',
+                options: ['锋利', '保护', '经验修补', '力量', '效率', '耐久', '火焰附加', '击退'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '当魔咒的最大等级为I级时，该魔咒在提示框中如何显示等级？',
+                options: ['显示为"I"', '显示为"1"', '不显示等级', '显示为"I级"', '显示为"1级"', '显示为"★"', '显示为"●"', '显示为"①"'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '以下哪种方式不能获得宝藏型魔咒？',
+                options: ['钓鱼', '要塞箱子战利品', '附魔台', '末地城箱子', '远古城市箱子', '丛林神庙箱子', '试炼密室宝库', '不祥宝库'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '基岩版中，具有火焰附加魔咒的附魔书可以用于点燃什么？',
+                options: ['TNT', 'TNT矿车', '苦力怕', '打火石', '营火', '熔炉', '下界传送门', '火焰弹'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '附魔书在Java版中存储魔咒的方式与基岩版有何不同？',
+                options: ['没有不同', 'Java版使用专有物品数据，基岩版类似其他附魔物品', '基岩版使用专有物品数据，Java版类似其他附魔物品', 'Java版不能存储魔咒', '基岩版不能存储魔咒', '两个版本都不能存储魔咒', '两个版本都使用相同方式', '只有创造模式可以'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '以下哪个结构箱子中的装备可以进行20–39级附魔？',
+                options: ['要塞', '丛林神庙', '末地城', '试炼密室', '远古城市', '沙漠神殿', '地牢', '废弃矿井'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '钓鱼得到的附魔物品可以进行多少级附魔？',
+                options: ['10级', '20级', '30级', '40级', '50级', '5-19级', '20-39级', '0-10级'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '以下哪个魔咒不属于宝藏型魔咒？',
+                options: ['经验修补', '冰霜行者', '绑定诅咒', '消失诅咒', '锋利', '以上都是宝藏型', '以上都不是宝藏型', '经验修补和冰霜行者是，诅咒不是'],
+                answer: [4]
+            }, {
+                type: 'single',
+                question: '基岩版中，袭击中生成的掠夺者和卫道士有可能会额外掉落多少级附魔的附魔书？',
+                options: ['10级', '20级', '30级', '40级', '50级', '5-19级', '20-39级', '0-10级'],
+                answer: [2]
+            }, {
+                type: 'single',
+                question: '附魔书在铁砧中与物品结合时，经验消耗比直接结合物品如何？',
+                options: ['多得多', '少得多', '完全相同', '取决于魔咒等级', '取决于物品类型', '取决于游戏版本', '取决于铁砧等级', '取决于经验等级'],
+                answer: [1]
+            }, {
+                type: 'single',
+                question: '试炼密室箱子战利品中，铁胸甲和铁斧可以进行多少级附魔？',
+                options: ['30级', '5-19级', '20-39级', '0-10级', '5-15级', '5-20级', '10-20级', '15-25级'],
+                answer: [3]
+            }, {
+                type: 'single',
+                question: '以下哪种情况下，村民的交易选项不能提供具有该魔咒的物品，被称为该魔咒的什么属性？',
+                options: ['宝藏魔咒', '无法交易获得', '无法以战利品获得', '不共存魔咒', '适用物品', '可附魔物品', '最大等级', '稀有度'],
+                answer: [1]
+            },
+
+            // ==================== 多选题 ====================
+            {
+                type: 'multi',
+                question: '以下哪些属于Java版世界生成中使用的密度函数？（选2项）',
+                options: ['温度', '湿度', '气压', '风力', '大陆性', '光照', '侵蚀度', '降水量'],
+                answer: [0, 1, 4, 6]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于Minecraft中的距离测量方式？（选3项）',
+                options: ['欧几里得距离', '曼哈顿距离', '切比雪夫距离', '海明距离', '余弦距离', '杰卡德距离', '马氏距离', '闵可夫斯基距离'],
+                answer: [0, 1, 2]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于游戏中的寻路系统分类？（选3项）',
+                options: ['地面寻路系统', '水中寻路系统', '飞行寻路系统', '洞穴寻路系统', '树木寻路系统', '墙面寻路系统', '地下寻路系统', '空中寻路系统'],
+                answer: [0, 1, 2]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于宝藏型魔咒？（选4项）',
+                options: ['经验修补', '冰霜行者', '绑定诅咒', '消失诅咒', '锋利', '保护', '效率', '耐久'],
+                answer: [0, 1, 2, 3]
+            }, {
+                type: 'multi',
+                question: '以下哪些方式可以执行Minecraft命令？（选4项）',
+                options: ['玩家通过聊天框输入', '命令方块', '专用服务器控制台', '函数', '红石电路', '压力板', '按钮', '拉杆'],
+                answer: [0, 1, 2, 3]
+            }, {
+                type: 'multi',
+                question: '以下哪些物品默认拥有enchantment_glint_override组件？（选4项）',
+                options: ['下界之星', '末地水晶', '附魔之瓶', '附魔金苹果', '钻石剑', '附魔书', '成书', '调试棒'],
+                answer: [0, 1, 2, 3, 5, 6, 7]
+            }, {
+                type: 'multi',
+                question: '以下哪些结构中的箱子战利品可以获得附有宝藏型魔咒的物品？（选4项）',
+                options: ['要塞', '丛林神庙', '末地城', '远古城市', '地牢', '废弃矿井', '沙漠神殿', '沉船'],
+                answer: [0, 1, 2, 3]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于路径节点类型中的方块默认节点类型？（选4项）',
+                options: ['OPEN', 'BLOCKED', 'WALKABLE', 'WATER', 'LAVA', 'FENCE', 'RAIL', 'DOOR_OPEN'],
+                answer: [0, 1, 3, 4, 5, 6, 7]
+            }, {
+                type: 'multi',
+                question: '以下哪些游戏机制使用欧几里得距离？（选4项）',
+                options: ['幽匿感测体的检测范围', '冰霜行者生成霜冰', '喷溅药水的影响范围', '火把的光衰减', '红石线信号扩散', '下界传送门搜索终点', '液体扩散', '拉杆的红石信号'],
+                answer: [0, 1, 2, 5]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于Java版中命令执行的可能结果？（选4项）',
+                options: ['无法解析', '执行失败', '执行成功', 'Void', '执行中断', '执行出错', '执行超时', '执行跳过'],
+                answer: [0, 1, 2, 3, 4, 5]
+            }, {
+                type: 'multi',
+                question: '以下哪些物品默认拥有equippable组件？（选4项）',
+                options: ['使用盔甲材料的物品', '鞍', '地毯', '鞘翅', '盾牌', '生物头颅', '雕刻南瓜', '挽具'],
+                answer: [0, 1, 2, 3, 4, 5, 6, 7]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于主世界生物群系放置中使用的密度函数？（选4项）',
+                options: ['温度', '湿度', '大陆性', '侵蚀度', '奇异性', '深度', '偏移值', '高度'],
+                answer: [0, 1, 2, 3, 4, 5]
+            }, {
+                type: 'multi',
+                question: '以下哪些游戏机制使用曼哈顿距离？（选4项）',
+                options: ['火把的光衰减', '红石线信号的扩散', '液体扩散', '拉杆的红石信号', '幽匿感测体的检测范围', '冰霜行者生成霜冰', '喷溅药水的影响范围', '下界传送门搜索终点'],
+                answer: [0, 1, 2, 3]
+            }, {
+                type: 'multi',
+                question: '以下哪些物品默认拥有block_state组件？（选4项）',
+                options: ['光源方块', '测试方块', '蜂巢', '蜂箱', '盾牌', '生物头颅', '雕刻南瓜', '狼铠'],
+                answer: [0, 1, 2, 3]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于魔咒的基本属性？（选4项）',
+                options: ['适用物品', '可附魔物品', '不共存魔咒', '最大等级', '最小等级', '出现条件', '宝藏魔咒', '稀有度'],
+                answer: [0, 1, 2, 3, 5]
+            }, {
+                type: 'multi',
+                question: '以下哪些结构中的箱子可以找到附魔书？（选4项）',
+                options: ['要塞', '丛林神庙', '末地城', '远古城市', '地牢', '废弃矿井', '沙漠神殿', '沉船'],
+                answer: [0, 1, 2, 3]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于物品存储的方式？（选2项）',
+                options: ['带槽位存储', '不带槽位存储', '带坐标存储', '不带坐标存储', '带实体存储', '不带实体存储', '带NBT存储', '不带NBT存储'],
+                answer: [0, 1]
+            }, {
+                type: 'multi',
+                question: '以下哪些生物在寻路系统中有特殊的行为？（选4项）',
+                options: ['嘎枝', '监守者', '炽足兽', '海豚', '僵尸', '骷髅', '末影人', '苦力怕'],
+                answer: [0, 1, 2, 3]
+            }, {
+                type: 'multi',
+                question: '以下哪些魔咒在基岩版中可以在附魔书上生效？（选2项）',
+                options: ['火焰附加', '风爆', '锋利', '保护', '效率', '耐久', '经验修补', '冰霜行者'],
+                answer: [0, 1]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于Java版/execute命令的储存值？（选2项）',
+                options: ['success值', 'result值', 'count值', 'value值', 'data值', 'output值', 'return值', 'status值'],
+                answer: [0, 1]
+            }, {
+                type: 'multi',
+                question: '以下哪些维度使用多重噪声生物群系产生源？（选2项）',
+                options: ['主世界', '下界', '末地', '天域', '月球', '马铃薯维度', '矿境', '梦之维度'],
+                answer: [0, 1]
+            }, {
+                type: 'multi',
+                question: '以下哪些物品默认拥有attribute_modifiers组件？（选4项）',
+                options: ['所有物品', '生物头颅', '雕刻南瓜', '使用工具材料的物品', '使用盔甲材料的物品', '矛', '盾牌', '狼铠'],
+                answer: [0, 1, 2, 3, 4]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于下界生物群系？（选4项）',
+                options: ['玄武岩三角洲', '绯红森林', '下界荒地', '诡异森林', '灵魂沙峡谷', '下界疣', '下界砖', '下界合金'],
+                answer: [0, 1, 2, 3, 4]
+            }, {
+                type: 'multi',
+                question: '以下哪些物品默认拥有food组件？（选2项）',
+                options: ['所有以物品形式食用的食物', '奶桶', '金苹果', '附魔金苹果', '下界疣', '胡萝卜', '马铃薯', '生牛肉'],
+                answer: [0, 1]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于主世界生物群系放置中温度等级的区间范围？（选4项）',
+                options: ['-1~-0.45', '-0.45~-0.15', '-0.15~0.2', '0.2~0.55', '0.55~1', '1~1.5', '-1.5~-1', '0.5~1'],
+                answer: [0, 1, 2, 3, 4]
+            }, {
+                type: 'multi',
+                question: '以下哪些命令的权限等级为2？（选4项）',
+                options: ['/force', '/function', '/gamemode', '/gamerule', '/give', '/help', '/item', '/kill'],
+                answer: [0, 1, 2, 3, 4, 6, 7]
+            }, {
+                type: 'multi',
+                question: '以下哪些物品默认拥有entity_data组件？（选2项）',
+                options: ['刷怪蛋', '生物桶', '附魔书', '成书', '调试棒', '下界之星', '末地水晶', '附魔之瓶'],
+                answer: [0, 1]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于寻路系统中环境相关节点类型的判定条件？（选4项）',
+                options: ['检查嘎枝是否绑定到嘎枝之心', '检查当前方块位置的方块默认节点类型', '检查当前方块位置下方方块的节点类型', '检查当前位置周围的24个方块', '检查生物是否可以开门', '检查生物是否可以飞行', '检查生物是否可以游泳', '检查生物是否处于水中'],
+                answer: [0, 1, 2, 3, 4]
+            }, {
+                type: 'multi',
+                question: '以下哪些结构中的装备可以进行附魔？（选4项）',
+                options: ['末地城', '远古城市', '试炼密室', '要塞', '丛林神庙', '地牢', '废弃矿井', '沙漠神殿'],
+                answer: [0, 1, 2]
+            }, {
+                type: 'multi',
+                question: '以下哪些物品默认拥有charged_projectiles组件？（选1项）',
+                options: ['弩', '弓', '三叉戟', '盾牌', '剑', '斧', '镐', '锹'],
+                answer: [0]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于Java版中命令/function在特定情况下没有储存值的情况？（选2项）',
+                options: ['Void', '执行中断', '无法解析', '执行失败', '执行成功', '执行出错', '执行超时', '执行跳过'],
+                answer: [0, 1]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于物品格式中的默认组件？（选4项）',
+                options: ['attribute_modifiers', 'banner_patterns', 'block_state', 'enchantments', 'entity_data', 'equippable', 'fireworks', 'food'],
+                answer: [0, 1, 2, 3, 4, 5, 6, 7]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于主世界生物群系放置中大陆性等级的划分？（选4项）',
+                options: ['蘑菇岛', '深海', '海洋', '沿岸', '准内陆', '内陆', '高原', '山地'],
+                answer: [0, 1, 2, 3, 4]
+            }, {
+                type: 'multi',
+                question: '以下哪些物品默认拥有instrument组件？（选1项）',
+                options: ['山羊角', '号角', '喇叭', '笛子', '鼓', '铃铛', '钟', '锣'],
+                answer: [0]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于寻路系统中路径节点代价为负值的类型？（选4项）',
+                options: ['BLOCKED', 'UNPASSABLE_RAIL', 'WATER', 'WALKABLE', 'FENCE', 'OPEN', 'RAIL', 'DOOR_OPEN'],
+                answer: [0, 1]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于试炼密室中可以进行附魔的物品？（选4项）',
+                options: ['铁胸甲', '铁斧', '弓', '弩', '钻石胸甲', '钻石斧', '铁剑', '钻石剑'],
+                answer: [0, 1, 2, 3, 4, 5]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于物品格式中带槽位存储的例子？（选4项）',
+                options: ['箱子中的物品', '玩家物品栏中的物品', '熔炉中的物品', '漏斗中的物品', '物品实体', '发射器中的物品', '酿造台中的物品', '潜影盒中的物品'],
+                answer: [0, 1, 2, 3, 5, 6, 7]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于寻路系统中非水中寻路系统的生物相关节点类型判定？（选4项）',
+                options: ['计算生物的寻路判定包围盒', '遍历判定包围盒内所有方块位置', '修正环境相关类型', '查找类型集合内路径节点代价最大的类型', '判定包围盒内包含空气则节点类型为BREACH', '判定包围盒内包含不含水且不是水的方块则节点类型为BLOCKED', '判定包围盒内包含含水方块则节点类型为WATER', '判定包围盒内包含水则节点类型为WATER'],
+                answer: [0, 1, 2, 3]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于Java版中命令执行出错的可能原因？（选2项）',
+                options: ['命令存在明显漏洞', '抛出除CommandSyntaxException以外的异常', '命令不完整', '存在无法解析的参数', '不满足命令的限制条件', '输入的命令不完整', '当前游戏不满足命令的限制条件', '当前世界不满足命令的限制条件'],
+                answer: [0, 1]
+            }, {
+                type: 'multi',
+                question: '以下哪些属于物品格式中默认拥有map_color组件的物品？（选1项）',
+                options: ['地图', '指南针', '时钟', '磁石指针', '空地图', '探险家地图', '藏宝图', '海洋探险家地图'],
+                answer: [0]
+            }
+        ];
+
+        // ============================================================
+        // 游戏逻辑（完全保持不变，仅替换题库）
+        // ============================================================
+        const TOTAL_QUESTIONS = 20;
+        const INITIAL_HEARTS = 5;
+        const TIME_LIMIT = 15;
+        const AUTO_NEXT_DELAY = 3;
+
+        let gameQuestions = [];
+        let currentIndex = 0;
+        let hearts = INITIAL_HEARTS;
+        let score = 0;
+        let answered = false;
+        let selectedIndices = [];
+        let timerInterval = null;
+        let timeLeft = TIME_LIMIT;
+        let gameActive = false;
+        let autoNextTimer = null;
+        let autoNextCountdown = AUTO_NEXT_DELAY;
+
+        // DOM 元素（与原来一致）
+        const page1 = document.getElementById('page1');
+        const page2 = document.getElementById('page2');
+        const page3 = document.getElementById('page3');
+        const page4 = document.getElementById('page4');
+        const text1 = document.getElementById('text1');
+        const text2 = document.getElementById('text2');
+        const text3 = document.getElementById('text3');
+        const text4 = document.getElementById('text4');
+        const gameTitle = document.getElementById('gameTitle');
+        const gamePanel = document.getElementById('gamePanel');
+        const resultPanel = document.getElementById('resultPanel');
+        const failOverlay = document.getElementById('failOverlay');
+
+        const progressText = document.getElementById('progressText');
+        const heartsDisplay = document.getElementById('heartsDisplay');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const qType = document.getElementById('qType');
+        const qText = document.getElementById('qText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const feedbackText = document.getElementById('feedbackText');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const resultRestartBtn = document.getElementById('resultRestartBtn');
+        const resultStar = document.getElementById('resultStar');
+        const resultScore = document.getElementById('resultScore');
+        const resultDetail = document.getElementById('resultDetail');
+        const resultComment = document.getElementById('resultComment');
+        const failReason = document.getElementById('failReason');
+        const autoNextIndicator = document.getElementById('autoNextIndicator');
+        const autoNextCountdownSpan = document.getElementById('autoNextCountdown');
+
+        const hurtBerryAudio = document.getElementById('hurtBerryAudio');
+        const hurt3Audio = document.getElementById('hurt3Audio');
+        const deathAudio1 = document.getElementById('deathAudio1');
+        const deathAudio2 = document.getElementById('deathAudio2');
+
+        const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+        function playHurtBerrySound() {
+            try {
+                hurtBerryAudio.currentTime = 0;
+                hurtBerryAudio.play().catch(e => console.log('音频播放失败:', e));
+            } catch (e) {
+                console.log('音频播放失败:', e);
+            }
+        }
+
+        function playFailSounds() {
+            try {
+                hurt3Audio.currentTime = 0;
+                hurt3Audio.play().catch(e => console.log('音频播放失败:', e));
+                deathAudio1.currentTime = 0;
+                deathAudio1.play().catch(e => console.log('音频播放失败:', e));
+                deathAudio2.currentTime = 0;
+                deathAudio2.play().catch(e => console.log('音频播放失败:', e));
+            } catch (e) {
+                console.log('音频播放失败:', e);
+            }
+        }
+
+        function typeLine(elem, content, speed = 60) {
+            let idx = 0;
+            elem.innerText = '';
+            return new Promise(resolve => {
+                const t = setInterval(() => {
+                    if (idx < content.length) {
+                        elem.innerText += content[idx++];
+                    } else {
+                        clearInterval(t);
+                        resolve();
+                    }
+                }, speed);
+            });
+        }
+
+        async function startGuide() {
+            await typeLine(text1, '⛏️ Minecraft 知识问答 · 生存挑战');
+            page1.addEventListener('click', () => {
+                page1.style.display = 'none';
+                page2.style.display = 'flex';
+                typeLine(text2, '❤️ 你有 5 颗心，答错扣心\n⏱️ 每题 15 秒，超时扣心');
+            }, {
+                once: true
+            });
+
+            page2.addEventListener('click', () => {
+                page2.style.display = 'none';
+                page3.style.display = 'flex';
+                typeLine(text3, '📚 从 40+ 道题库中随机抽取 20 题\n✅ 全部答完且存活即为过关');
+            }, {
+                once: true
+            });
+
+            page3.addEventListener('click', () => {
+                page3.style.display = 'none';
+                page4.style.display = 'flex';
+                typeLine(text4, '⚡ 你必须要在憋尿的情况下进行游戏！\n若生命耗尽，你需要接受惩罚——直接尿裤子！！');
+            }, {
+                once: true
+            });
+
+            page4.addEventListener('click', () => {
+                page4.style.display = 'none';
+                page5.style.display = 'flex';
+                typeLine(text5, '⚡ 点击开始你的挑战！');
+            }, {
+                once: true
+            });
+
+            page5.addEventListener('click', () => {
+                page5.style.display = 'none';
+                gameTitle.style.display = 'block';
+                gamePanel.style.display = 'block';
+                initGame();
+            }, {
+                once: true
+            });
+        }
+
+        function initGame() {
+            const shuffled = [...FULL_BANK];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            gameQuestions = shuffled.slice(0, TOTAL_QUESTIONS);
+
+            currentIndex = 0;
+            hearts = INITIAL_HEARTS;
+            score = 0;
+            gameActive = true;
+            resultPanel.style.display = 'none';
+            failOverlay.style.display = 'none';
+            gamePanel.style.display = 'block';
+            document.body.classList.remove('shake');
+            autoNextIndicator.classList.add('hidden');
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (currentIndex >= gameQuestions.length) {
+                showResult(true);
+                return;
+            }
+
+            const q = gameQuestions[currentIndex];
+            answered = false;
+            selectedIndices = [];
+            confirmBtn.disabled = true;
+            confirmBtn.classList.remove('hidden');
+            restartBtn.classList.add('hidden');
+            feedbackText.innerText = '\u00A0';
+            feedbackText.className = 'feedback-area';
+            document.body.classList.remove('shake');
+            autoNextIndicator.classList.add('hidden');
+            clearTimeout(autoNextTimer);
+
+            progressText.innerText = `第 ${currentIndex + 1} / ${gameQuestions.length} 题`;
+            qType.innerText = q.type === 'single' ? '📖 单选题' : '📚 多选题';
+            qText.innerText = q.question;
+
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.dataset.index = idx;
+                btn.innerHTML = `<span class="letter">${LETTERS[idx]}.</span> ${opt}`;
+                btn.addEventListener('click', () => toggleOption(idx));
+                optionsContainer.appendChild(btn);
+            });
+
+            updateHearts();
+
+            clearInterval(timerInterval);
+            timeLeft = TIME_LIMIT;
+            timerDisplay.innerText = timeLeft;
+            timerDisplay.className = 'timer';
+            startTimer();
+
+            confirmBtn.onclick = confirmAnswer;
+            restartBtn.onclick = () => {
+                initGame();
+            };
+            resultRestartBtn.onclick = () => {
+                initGame();
+            };
+        }
+
+        function toggleOption(index) {
+            if (answered || !gameActive) return;
+            const q = gameQuestions[currentIndex];
+            const btns = optionsContainer.querySelectorAll('.option-btn');
+            const btn = btns[index];
+
+            if (q.type === 'single') {
+                btns.forEach(b => b.classList.remove('selected'));
+                selectedIndices = [];
+                btn.classList.add('selected');
+                selectedIndices.push(index);
+            } else {
+                if (btn.classList.contains('selected')) {
+                    btn.classList.remove('selected');
+                    selectedIndices = selectedIndices.filter(i => i !== index);
+                } else {
+                    btn.classList.add('selected');
+                    selectedIndices.push(index);
+                }
+                selectedIndices.sort((a, b) => a - b);
+            }
+            confirmBtn.disabled = (selectedIndices.length === 0);
+            feedbackText.innerText = '\u00A0';
+            feedbackText.className = 'feedback-area';
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.innerText = timeLeft;
+
+                if (timeLeft <= 5 && timeLeft > 3) {
+                    timerDisplay.className = 'timer warning';
+                } else if (timeLeft <= 3) {
+                    timerDisplay.className = 'timer danger';
+                } else {
+                    timerDisplay.className = 'timer';
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleTimeout() {
+            if (answered || !gameActive) return;
+            answered = true;
+            confirmBtn.disabled = true;
+            document.body.classList.add('shake');
+
+            hearts--;
+            updateHearts();
+            playHurtBerrySound();
+
+            feedbackText.innerText = '⏰ 时间到！扣除 1 颗心，你的膀胱变得逐渐紧张……';
+            feedbackText.className = 'feedback-area timeout';
+
+            const q = gameQuestions[currentIndex];
+            const btns = optionsContainer.querySelectorAll('.option-btn');
+            btns.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (q.answer.includes(idx)) {
+                    btn.classList.add('correct-reveal');
+                }
+                if (selectedIndices.includes(idx) && !q.answer.includes(idx)) {
+                    btn.classList.add('wrong-reveal');
+                }
+                btn.classList.remove('selected');
+            });
+
+            if (hearts <= 0) {
+                gameActive = false;
+                setTimeout(() => showFail(), 600);
+                return;
+            }
+
+            scheduleAutoNext();
+        }
+
+        function confirmAnswer() {
+            if (answered || !gameActive || selectedIndices.length === 0) return;
+            clearInterval(timerInterval);
+            const q = gameQuestions[currentIndex];
+            const isCorrect = arraysEqual(selectedIndices, q.answer);
+            answered = true;
+            confirmBtn.disabled = true;
+            document.body.classList.remove('shake');
+
+            const btns = optionsContainer.querySelectorAll('.option-btn');
+            btns.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (q.answer.includes(idx)) {
+                    btn.classList.add('correct-reveal');
+                }
+                if (selectedIndices.includes(idx) && !q.answer.includes(idx)) {
+                    btn.classList.add('wrong-reveal');
+                }
+                btn.classList.remove('selected');
+            });
+
+            let heartLoss = 0;
+            if (!isCorrect) {
+                if (q.type === 'single') {
+                    heartLoss = 1;
+                } else {
+                    heartLoss = 2;
+                }
+                hearts = Math.max(0, hearts - heartLoss);
+                updateHearts();
+                playHurtBerrySound();
+                feedbackText.innerText = `❌ 回答错误，${q.type === 'single' ? '扣除1' : '扣除2'}颗心，你的膀胱变得更加紧张`;
+                feedbackText.className = 'feedback-area wrong';
+                document.body.classList.add('shake');
+                setTimeout(() => document.body.classList.remove('shake'), 500);
+            } else {
+                score++;
+                feedbackText.innerText = '✅ 回答正确！';
+                feedbackText.className = 'feedback-area correct';
+            }
+
+            if (hearts <= 0) {
+                gameActive = false;
+                setTimeout(() => showFail(), 600);
+                return;
+            }
+
+            scheduleAutoNext();
+        }
+
+        function scheduleAutoNext() {
+            autoNextCountdown = AUTO_NEXT_DELAY;
+            autoNextIndicator.classList.remove('hidden');
+            autoNextCountdownSpan.innerText = autoNextCountdown;
+            confirmBtn.classList.add('hidden');
+
+            autoNextTimer = setInterval(() => {
+                autoNextCountdown--;
+                autoNextCountdownSpan.innerText = autoNextCountdown;
+                if (autoNextCountdown <= 0) {
+                    clearInterval(autoNextTimer);
+                    autoNextIndicator.classList.add('hidden');
+                    confirmBtn.classList.remove('hidden');
+                    currentIndex++;
+                    if (currentIndex >= gameQuestions.length) {
+                        showResult(true);
+                    } else {
+                        renderQuestion();
+                    }
+                }
+            }, 1000);
+        }
+
+        function showResult(won) {
+            gamePanel.style.display = 'none';
+            if (won) {
+                resultPanel.style.display = 'block';
+                const pct = Math.round((score / gameQuestions.length) * 100);
+                resultScore.innerText = `${score} / ${gameQuestions.length}`;
+                resultDetail.innerText = `答对 ${score} 题，正确率 ${pct}%`;
+                let star, comment;
+                if (pct === 100) {
+                    star = '🌟🌟🌟';
+                    comment = '🎉 完美通关！你是真正的 MC 大师！';
+                } else if (pct >= 80) {
+                    star = '🌟🌟';
+                    comment = '👏 太棒了！你对 MC 的了解非常深入！';
+                } else if (pct >= 60) {
+                    star = '⭐';
+                    comment = '👍 不错哦，继续探索吧！';
+                } else {
+                    star = '📖';
+                    comment = '💪 多看看 Wiki，你会变得更强大！';
+                }
+                resultStar.innerText = star;
+                resultComment.innerText = comment;
+                resultRestartBtn.onclick = () => {
+                    initGame();
+                };
+            }
+        }
+
+        function showFail() {
+            gamePanel.style.display = 'none';
+            resultPanel.style.display = 'none';
+            failOverlay.style.display = 'flex';
+            failReason.innerText = '你已耗尽所有生命';
+            document.body.classList.add('shake');
+            playFailSounds();
+            setTimeout(() => {
+                window.location.href = 'https://zh.minecraft.wiki';
+            }, 3000);
+        }
+
+        function updateHearts() {
+            const full = '❤️'.repeat(hearts);
+            const empty = '🖤'.repeat(INITIAL_HEARTS - hearts);
+            heartsDisplay.innerText = full + empty;
+            if (hearts <= 2) {
+                heartsDisplay.style.color = '#ff4466';
+                heartsDisplay.style.textShadow = '0 0 20px #ff446688';
+            } else {
+                heartsDisplay.style.color = '#ff4466';
+                heartsDisplay.style.textShadow = '0 0 12px #ff446688';
+            }
+        }
+
+        function arraysEqual(a, b) {
+            if (a.length !== b.length) return false;
+            const sa = [...a].sort((x, y) => x - y);
+            const sb = [...b].sort((x, y) => x - y);
+            for (let i = 0; i < sa.length; i++) {
+                if (sa[i] !== sb[i]) return false;
+            }
+            return true;
+        }
+
+        window.onload = startGuide;
+    </script>
+
+</body>
+
+</html>
